@@ -289,14 +289,30 @@ func _get_process_time_metric_value() -> int:
 	return int(_process_time_metric_value)
 
 
+func _get_class_name_substitute(node: Node) -> Array[StringName]:
+	if node is BeehaveTree:
+		return [&"BeehaveTree"] 
+	if node is Leaf:
+		return [&"Leaf"]
+	if node is Composite:
+		return [&"Composite"]
+	return [&"Decorator"]
+
+
 func _get_debugger_data(node: Node) -> Dictionary:
 	if not (node is BeehaveTree or node is BeehaveNode):
 		return {}
-
+	
+	var type: Array[StringName]
+	if node.has_method(&"get_class_name"): 
+		type = node.get_class_name() 
+	else:
+		type = _get_class_name_substitute(node)
+	
 	var data := {
 		path = node.get_path(),
 		name = node.name,
-		type = node.get_class_name(),
+		type = type,
 		id = str(node.get_instance_id())
 	}
 	if node.get_child_count() > 0:
